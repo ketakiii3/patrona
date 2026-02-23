@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import useGPS from '../hooks/useGPS';
 import useSafetyMonitor from '../hooks/useSafetyMonitor';
 import useVoiceSession from '../hooks/useVoiceSession';
@@ -17,6 +18,10 @@ function useElapsed(startTime) {
 }
 
 export default function WalkScreen({ user, walkSession, onAlert, onArrived }) {
+  const { getToken } = useAuth();
+  const getTokenRef = useRef(getToken);
+  useEffect(() => { getTokenRef.current = getToken; }, [getToken]);
+
   const timer = useElapsed(walkSession?.startTime || Date.now());
   const hasAlertedRef = useRef(false);
   const pingIntervalRef = useRef(null);
@@ -36,7 +41,7 @@ export default function WalkScreen({ user, walkSession, onAlert, onArrived }) {
     pingIntervalRef.current = setInterval(() => {
       const pos = gpsRef.current;
       if (pos) {
-        pingLocation({ sessionId, latitude: pos.lat, longitude: pos.lng });
+        pingLocation({ sessionId, latitude: pos.lat, longitude: pos.lng, getToken: getTokenRef.current });
       }
     }, 10000);
 
@@ -56,6 +61,7 @@ export default function WalkScreen({ user, walkSession, onAlert, onArrived }) {
           latitude: pos.lat,
           longitude: pos.lng,
           triggerType,
+          getToken,
         });
       }
       onAlert();
