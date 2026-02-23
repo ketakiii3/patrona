@@ -163,6 +163,4 @@ Open `http://localhost:5173`
 | GET | `/api/location/:sessionId` | Get latest location for a session |
 | GET | `/api/health` | Health check |
 
-## License
 
-MIT
