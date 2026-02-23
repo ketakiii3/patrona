@@ -82,14 +82,17 @@ export default function App() {
       <div style={{ position: 'relative', zIndex: 1, height: '100%' }}>
         {isWalking ? (
           <>
-            {walkState === 'walking' && (
-              <WalkScreen
-                key="walk"
-                user={user}
-                walkSession={walkSession}
-                onAlert={() => setWalkState('alert')}
-                onArrived={() => setWalkState('arrived')}
-              />
+            {/* Keep WalkScreen mounted during alert so voice session stays alive */}
+            {(walkState === 'walking' || walkState === 'alert') && (
+              <div style={{ display: walkState === 'alert' ? 'none' : 'contents' }}>
+                <WalkScreen
+                  key="walk"
+                  user={user}
+                  walkSession={walkSession}
+                  onAlert={() => setWalkState('alert')}
+                  onArrived={() => setWalkState('arrived')}
+                />
+              </div>
             )}
             {walkState === 'alert' && (
               <AlertScreen

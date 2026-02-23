@@ -24,11 +24,17 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { userName, contacts, latitude, longitude, triggerType } = req.body;
+  const { userName, contacts: rawContacts, latitude, longitude, triggerType } = req.body;
 
-  if (!contacts?.length) {
+  if (!rawContacts?.length) {
     return res.status(400).json({ success: false, error: 'No contacts provided' });
   }
+
+  // Strip spaces/dashes from phone numbers — Twilio needs clean format like +16513848787
+  const contacts = rawContacts.map(c => ({
+    ...c,
+    phone: c.phone.replace(/[\s\-\(\)]/g, ''),
+  }));
 
   const trackingUrl = buildTrackingUrl(userName, latitude, longitude, Date.now());
   const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;

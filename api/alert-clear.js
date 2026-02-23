@@ -12,11 +12,16 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { userName, contacts } = req.body;
+  const { userName, contacts: rawContacts } = req.body;
 
-  if (!contacts?.length) {
+  if (!rawContacts?.length) {
     return res.status(400).json({ success: false, error: 'No contacts provided' });
   }
+
+  const contacts = rawContacts.map(c => ({
+    ...c,
+    phone: c.phone.replace(/[\s\-\(\)]/g, ''),
+  }));
 
   const message =
     `✅ Patrona Update: ${userName} has confirmed they are safe. ` +

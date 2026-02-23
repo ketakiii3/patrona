@@ -32,11 +32,16 @@ function buildTrackingUrl(name, latitude, longitude, timestamp) {
 
 // POST /api/alert — Send emergency SMS to all contacts
 app.post('/api/alert', async (req, res) => {
-  const { userName, contacts, latitude, longitude, triggerType } = req.body;
+  const { userName, contacts: rawContacts, latitude, longitude, triggerType } = req.body;
 
-  if (!contacts?.length) {
+  if (!rawContacts?.length) {
     return res.status(400).json({ success: false, error: 'No contacts provided' });
   }
+
+  const contacts = rawContacts.map(c => ({
+    ...c,
+    phone: c.phone.replace(/[\s\-\(\)]/g, ''),
+  }));
 
   const trackingUrl = buildTrackingUrl(userName, latitude, longitude, Date.now());
   const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -90,11 +95,16 @@ app.post('/api/alert', async (req, res) => {
 
 // POST /api/alert/clear — Send all-clear SMS
 app.post('/api/alert/clear', async (req, res) => {
-  const { userName, contacts } = req.body;
+  const { userName, contacts: rawContacts } = req.body;
 
-  if (!contacts?.length) {
+  if (!rawContacts?.length) {
     return res.status(400).json({ success: false, error: 'No contacts provided' });
   }
+
+  const contacts = rawContacts.map(c => ({
+    ...c,
+    phone: c.phone.replace(/[\s\-\(\)]/g, ''),
+  }));
 
   const message =
     `✅ Patrona Update: ${userName} has confirmed they are safe. ` +
