@@ -1,0 +1,162 @@
+import express from 'express';
+import twilio from 'twilio';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const app = express();
+app.use(cors({ origin: '*' }));
+app.use(express.json());
+
+// In-memory location store (keyed by sessionId)
+// For production, use a database
+const locationStore = new Map();
+
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
+
+function buildTrackingUrl(name, latitude, longitude, timestamp) {
+  // Use the frontend URL (set FRONTEND_URL in .env) or fall back to localhost
+  const base = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const params = new URLSearchParams({
+    tracking: '1',
+    name,
+    lat: latitude.toFixed(6),
+    lng: longitude.toFixed(6),
+    ts: timestamp || Date.now(),
+  });
+  return `${base}?${params.toString()}`;
+}
+
+// POST /api/alert — Send emergency SMS to all contacts
+app.post('/api/alert', async (req, res) => {
+  const { userName, contacts, latitude, longitude, triggerType } = req.body;
+
+  if (!contacts?.length) {
+    return res.status(400).json({ success: false, error: 'No contacts provided' });
+  }
+
+  const trackingUrl = buildTrackingUrl(userName, latitude, longitude, Date.now());
+  const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+  const triggerLabel =
+    triggerType === 'safeword'
+      ? 'safe word detected'
+      : triggerType === 'silence'
+      ? 'no response to check-ins'
+      : triggerType === 'deviation'
+      ? 'route deviation detected'
+      : triggerType;
+
+  const message =
+    `🆘 Patrona Alert: ${userName} may need help.\n` +
+    `Reason: ${triggerLabel}.\n` +
+    `Live location: ${mapsLink}\n` +
+    `Track here: ${trackingUrl}\n` +
+    `Sent by Patrona safety system.`;
+
+  if (!twilioClient) {
+    console.warn('[Patrona] Twilio not configured — would have sent:');
+    console.warn(message);
+    return res.json({ success: true, mock: true, messagesSent: contacts.length });
+  }
+
+  try {
+    const results = await Promise.allSettled(
+      contacts.map((contact) =>
+        twilioClient.messages.create({
+          body: message,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: contact.phone,
+        })
+      )
+    );
+
+    const sent = results.filter((r) => r.status === 'fulfilled').length;
+    const failed = results.filter((r) => r.status === 'rejected');
+
+    if (failed.length) {
+      console.error('[Patrona] Some messages failed:', failed.map((f) => f.reason));
+    }
+
+    res.json({ success: true, messagesSent: sent, failed: failed.length });
+  } catch (error) {
+    console.error('[Patrona] Twilio error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/alert/clear — Send all-clear SMS
+app.post('/api/alert/clear', async (req, res) => {
+  const { userName, contacts } = req.body;
+
+  if (!contacts?.length) {
+    return res.status(400).json({ success: false, error: 'No contacts provided' });
+  }
+
+  const message =
+    `✅ Patrona Update: ${userName} has confirmed they are safe. ` +
+    `Alert cleared. No further action needed.`;
+
+  if (!twilioClient) {
+    console.warn('[Patrona] Twilio not configured — would have sent all-clear:', message);
+    return res.json({ success: true, mock: true });
+  }
+
+  try {
+    await Promise.allSettled(
+      contacts.map((contact) =>
+        twilioClient.messages.create({
+          body: message,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: contact.phone,
+        })
+      )
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[Patrona] All-clear error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /api/ping — Store latest location for a session
+app.post('/api/ping', (req, res) => {
+  const { sessionId, latitude, longitude, timestamp } = req.body;
+  if (sessionId) {
+    locationStore.set(sessionId, { latitude, longitude, timestamp: timestamp || Date.now() });
+    // Clean up old sessions (older than 12h)
+    for (const [id, loc] of locationStore.entries()) {
+      if (Date.now() - loc.timestamp > 12 * 60 * 60 * 1000) {
+        locationStore.delete(id);
+      }
+    }
+  }
+  res.json({ success: true });
+});
+
+// GET /api/location/:sessionId — Get latest location for a session
+app.get('/api/location/:sessionId', (req, res) => {
+  const loc = locationStore.get(req.params.sessionId);
+  if (!loc) {
+    return res.status(404).json({ success: false, error: 'Session not found' });
+  }
+  res.json({ success: true, ...loc });
+});
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({
+    ok: true,
+    twilio: !!twilioClient,
+    timestamp: new Date().toISOString(),
+  });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`🌙 Patrona server running on port ${PORT}`);
+  console.log(`   Twilio: ${twilioClient ? '✓ configured' : '✗ not configured (mock mode)'}`);
+});

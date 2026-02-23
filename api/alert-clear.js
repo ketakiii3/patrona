@@ -1,0 +1,45 @@
+import twilio from 'twilio';
+
+const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+  : null;
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { userName, contacts } = req.body;
+
+  if (!contacts?.length) {
+    return res.status(400).json({ success: false, error: 'No contacts provided' });
+  }
+
+  const message =
+    `✅ Patrona Update: ${userName} has confirmed they are safe. ` +
+    `Alert cleared. No further action needed.`;
+
+  if (!twilioClient) {
+    console.warn('[Patrona] Twilio not configured — would have sent all-clear:', message);
+    return res.json({ success: true, mock: true });
+  }
+
+  try {
+    await Promise.allSettled(
+      contacts.map((contact) =>
+        twilioClient.messages.create({
+          body: message,
+          from: process.env.TWILIO_PHONE_NUMBER,
+          to: contact.phone,
+        })
+      )
+    );
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[Patrona] All-clear error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
