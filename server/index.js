@@ -216,6 +216,15 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
+// Clean JSON error handler (prevents stack traces leaking as HTML)
+app.use((err, _req, res, _next) => {
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ success: false, error: 'Request too large' });
+  }
+  console.error('[Patrona] Unhandled error:', err);
+  res.status(500).json({ success: false, error: 'Internal server error' });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🌙 Patrona server running on port ${PORT}`);
