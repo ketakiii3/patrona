@@ -1,5 +1,7 @@
+import { setCorsHeaders } from './_lib/cors.js';
+
 export default function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setCorsHeaders(req, res);
 
   res.json({
     ok: true,
