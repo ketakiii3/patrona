@@ -1,17 +1,19 @@
 const API_URL = import.meta.env.VITE_API_URL || '';
-const API_SECRET = import.meta.env.VITE_API_SECRET || '';
 
-function authHeaders() {
+async function authHeaders(getToken) {
   const headers = { 'Content-Type': 'application/json' };
-  if (API_SECRET) headers['X-Api-Key'] = API_SECRET;
+  if (getToken) {
+    const token = await getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
   return headers;
 }
 
-export async function sendEmergencyAlert({ userName, contacts, latitude, longitude, triggerType }) {
+export async function sendEmergencyAlert({ userName, contacts, latitude, longitude, triggerType, getToken }) {
   try {
     const response = await fetch(`${API_URL}/api/alert`, {
       method: 'POST',
-      headers: authHeaders(),
+      headers: await authHeaders(getToken),
       body: JSON.stringify({ userName, contacts, latitude, longitude, triggerType }),
     });
     return await response.json();
@@ -21,11 +23,11 @@ export async function sendEmergencyAlert({ userName, contacts, latitude, longitu
   }
 }
 
-export async function sendAllClear({ userName, contacts }) {
+export async function sendAllClear({ userName, contacts, getToken }) {
   try {
     const response = await fetch(`${API_URL}/api/alert/clear`, {
       method: 'POST',
-      headers: authHeaders(),
+      headers: await authHeaders(getToken),
       body: JSON.stringify({ userName, contacts }),
     });
     return await response.json();
@@ -35,11 +37,11 @@ export async function sendAllClear({ userName, contacts }) {
   }
 }
 
-export async function pingLocation({ sessionId, latitude, longitude }) {
+export async function pingLocation({ sessionId, latitude, longitude, getToken }) {
   try {
     await fetch(`${API_URL}/api/ping`, {
       method: 'POST',
-      headers: authHeaders(),
+      headers: await authHeaders(getToken),
       body: JSON.stringify({ sessionId, latitude, longitude, timestamp: Date.now() }),
     });
   } catch {
