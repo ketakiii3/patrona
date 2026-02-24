@@ -1,12 +1,8 @@
-import twilio from 'twilio';
 import { setCorsHeaders } from './_lib/cors.js';
 import { isRateLimited, getClientIp } from './_lib/rateLimit.js';
 import { isAuthorized } from './_lib/auth.js';
 import { validateClearBody } from './_lib/validate.js';
-
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
+import { sendSms } from './_lib/sms.js';
 
 export default async function handler(req, res) {
   setCorsHeaders(req, res);
@@ -41,23 +37,12 @@ export default async function handler(req, res) {
   }));
 
   const message =
-    `✅ Patrona Update: ${userName.trim()} has confirmed they are safe. ` +
+    `Patrona Update: ${userName.trim()} has confirmed they are safe. ` +
     `Alert cleared. No further action needed.`;
-
-  if (!twilioClient) {
-    console.warn('[Patrona] Twilio not configured — would have sent all-clear:', message);
-    return res.json({ success: true, mock: true });
-  }
 
   try {
     await Promise.allSettled(
-      contacts.map((contact) =>
-        twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: contact.phone,
-        })
-      )
+      contacts.map((contact) => sendSms(contact.phone, message))
     );
     res.json({ success: true });
   } catch (error) {

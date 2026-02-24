@@ -1,12 +1,8 @@
-import twilio from 'twilio';
 import { setCorsHeaders } from './_lib/cors.js';
 import { isRateLimited, getClientIp } from './_lib/rateLimit.js';
 import { isAuthorized } from './_lib/auth.js';
 import { validateAlertBody } from './_lib/validate.js';
-
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
+import { sendSms } from './_lib/sms.js';
 
 function buildTrackingUrl(name, latitude, longitude, timestamp) {
   const base = process.env.FRONTEND_URL || 'https://patrona.vercel.app';
@@ -47,7 +43,6 @@ export default async function handler(req, res) {
 
   const { userName, contacts: rawContacts, latitude, longitude, triggerType } = req.body;
 
-  // Strip spaces/dashes from phone numbers — Twilio needs clean format like +16513848787
   const contacts = rawContacts.map(c => ({
     ...c,
     phone: c.phone.replace(/[\s\-\(\)]/g, ''),
@@ -59,29 +54,18 @@ export default async function handler(req, res) {
   const triggerLabel =
     triggerType === 'safeword' ? 'safe word detected'
     : triggerType === 'silence' ? 'no response to check-ins'
-    : 'route deviation detected'; // triggerType is already validated to one of three values
+    : 'route deviation detected';
 
   const message =
-    `🆘 Patrona Alert: ${userName.trim()} may need help.\n` +
+    `Patrona Alert: ${userName.trim()} may need help.\n` +
     `Reason: ${triggerLabel}.\n` +
     `Live location: ${mapsLink}\n` +
     `Track here: ${trackingUrl}\n` +
     `Sent by Patrona safety system.`;
 
-  if (!twilioClient) {
-    console.warn('[Patrona] Twilio not configured — would have sent:', message);
-    return res.json({ success: true, mock: true, messagesSent: contacts.length });
-  }
-
   try {
     const results = await Promise.allSettled(
-      contacts.map((contact) =>
-        twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: contact.phone,
-        })
-      )
+      contacts.map((contact) => sendSms(contact.phone, message))
     );
 
     const sent = results.filter((r) => r.status === 'fulfilled').length;
@@ -93,7 +77,7 @@ export default async function handler(req, res) {
 
     res.json({ success: true, messagesSent: sent, failed: failed.length });
   } catch (error) {
-    console.error('[Patrona] Twilio error:', error);
+    console.error('[Patrona] SMS error:', error);
     res.status(500).json({ success: false, error: 'Failed to send alert' });
   }
 }

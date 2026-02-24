@@ -1,5 +1,4 @@
 import express from 'express';
-import twilio from 'twilio';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
@@ -63,16 +62,25 @@ function validateCoords(latitude, longitude) {
   return null;
 }
 
+async function sendSms(phone, message) {
+  const key = process.env.TEXTBELT_KEY;
+  if (!key) {
+    console.warn('[Patrona] TEXTBELT_KEY not set — mock SMS to', phone);
+    return;
+  }
+  const res = await fetch('https://textbelt.com/text', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, message, key }),
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || 'Textbelt send failed');
+}
+
 // In-memory location store (keyed by sessionId)
-// For production, use a database
 const locationStore = new Map();
 
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
-
 function buildTrackingUrl(name, latitude, longitude, timestamp) {
-  // Use the frontend URL (set FRONTEND_URL in .env) or fall back to localhost
   const base = process.env.FRONTEND_URL || 'http://localhost:5173';
   const params = new URLSearchParams({
     tracking: '1',
@@ -117,27 +125,15 @@ app.post('/api/alert', requireAuth, alertLimiter, async (req, res) => {
     : 'route deviation detected';
 
   const message =
-    `🆘 Patrona Alert: ${userName.trim()} may need help.\n` +
+    `Patrona Alert: ${userName.trim()} may need help.\n` +
     `Reason: ${triggerLabel}.\n` +
     `Live location: ${mapsLink}\n` +
     `Track here: ${trackingUrl}\n` +
     `Sent by Patrona safety system.`;
 
-  if (!twilioClient) {
-    console.warn('[Patrona] Twilio not configured — would have sent:');
-    console.warn(message);
-    return res.json({ success: true, mock: true, messagesSent: contacts.length });
-  }
-
   try {
     const results = await Promise.allSettled(
-      contacts.map((contact) =>
-        twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: contact.phone,
-        })
-      )
+      contacts.map((contact) => sendSms(contact.phone, message))
     );
 
     const sent = results.filter((r) => r.status === 'fulfilled').length;
@@ -149,7 +145,7 @@ app.post('/api/alert', requireAuth, alertLimiter, async (req, res) => {
 
     res.json({ success: true, messagesSent: sent, failed: failed.length });
   } catch (error) {
-    console.error('[Patrona] Twilio error:', error);
+    console.error('[Patrona] SMS error:', error);
     res.status(500).json({ success: false, error: 'Failed to send alert' });
   }
 });
@@ -172,23 +168,12 @@ app.post('/api/alert/clear', requireAuth, clearLimiter, async (req, res) => {
   }));
 
   const message =
-    `✅ Patrona Update: ${userName.trim()} has confirmed they are safe. ` +
+    `Patrona Update: ${userName.trim()} has confirmed they are safe. ` +
     `Alert cleared. No further action needed.`;
-
-  if (!twilioClient) {
-    console.warn('[Patrona] Twilio not configured — would have sent all-clear:', message);
-    return res.json({ success: true, mock: true });
-  }
 
   try {
     await Promise.allSettled(
-      contacts.map((contact) =>
-        twilioClient.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: contact.phone,
-        })
-      )
+      contacts.map((contact) => sendSms(contact.phone, message))
     );
     res.json({ success: true });
   } catch (error) {
@@ -241,5 +226,5 @@ app.use((err, _req, res, _next) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🌙 Patrona server running on port ${PORT}`);
-  console.log(`   Twilio: ${twilioClient ? '✓ configured' : '✗ not configured (mock mode)'}`);
+  console.log(`   SMS: ${process.env.TEXTBELT_KEY ? '✓ Textbelt configured' : '✗ TEXTBELT_KEY not set (mock mode)'}`);
 });
