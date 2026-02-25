@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Patrona" width="200" />
+  <img src="public/logo.png" alt="Patrona" width="200" />
 </p>
 
 # Patrona
