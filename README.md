@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Patrona" width="200" />
+</p>
+
 # Patrona
 
 **Your AI voice companion for getting home safe at night.**
