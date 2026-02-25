@@ -73,7 +73,12 @@ html, body, #root {
 
 body {
   background: var(--bg);
-  overscroll-behavior: none;
+}
+
+@supports (overscroll-behavior: none) {
+  body {
+    overscroll-behavior: none;
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -122,7 +127,6 @@ body {
   z-index: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 .screen-static {
@@ -168,6 +172,7 @@ body {
   outline: none;
   transition: border-color 0.2s ease;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .sw-input:focus {
