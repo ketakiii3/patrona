@@ -214,6 +214,9 @@ export default function AlertScreen({ user, walkSession, onSafe, onEndWalk }) {
           gap: '12px',
         }}
       >
+        <a href="tel:911" className="btn-emergency">
+          Call 911
+        </a>
         <button
           className="btn-alert"
           onClick={handleImSafe}

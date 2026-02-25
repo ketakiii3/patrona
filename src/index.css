@@ -283,6 +283,33 @@ body {
   opacity: 0.5;
 }
 
+/* Emergency — Call 911 */
+.btn-emergency {
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 100px;
+  background: #d62828;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: opacity 0.18s, transform 0.14s;
+  box-shadow: 0 0 0 1px rgba(214, 40, 40, 0.3), 0 4px 16px rgba(214, 40, 40, 0.25);
+}
+
+.btn-emergency:hover {
+  opacity: 0.9;
+}
+
+.btn-emergency:active {
+  transform: scale(0.975);
+}
+
 /* Ghost */
 .btn-ghost {
   background: none;
