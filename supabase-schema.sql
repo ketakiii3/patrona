@@ -6,10 +6,16 @@
 -- 1. Users table (names + safe words only, no addresses)
 create table if not exists users (
   id uuid default gen_random_uuid() primary key,
+  clerk_id text unique,
   name text not null,
   safe_word text not null,
+  home_address text default '',
   created_at timestamptz default now()
 );
+
+-- Add columns to existing tables if they were created without them
+alter table users add column if not exists clerk_id text unique;
+alter table users add column if not exists home_address text default '';
 
 -- 2. Emergency contacts (linked to users)
 create table if not exists emergency_contacts (

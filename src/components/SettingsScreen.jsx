@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import { saveUser } from '../utils/storage';
+import { saveUserToCloud } from '../utils/userApi';
 
 function Section({ title, children }) {
   return (
@@ -11,12 +13,14 @@ function Section({ title, children }) {
 }
 
 export default function SettingsScreen({ user, theme, toggleTheme, onUserUpdate }) {
+  const { getToken } = useAuth();
   const [editing, setEditing] = useState(null); // null | 'profile' | 'contacts' | 'safeword'
   const [localUser, setLocalUser] = useState({ ...user });
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
     saveUser(localUser);
+    saveUserToCloud(localUser, getToken); // fire-and-forget
     onUserUpdate(localUser);
     setSaved(true);
     setTimeout(() => {

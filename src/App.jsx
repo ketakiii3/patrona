@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth, SignIn } from '@clerk/clerk-react';
-import { hasUser, getUser, setStorageUserId } from './utils/storage';
+import { hasUser, getUser, saveUser, setStorageUserId } from './utils/storage';
+import { loadUserFromCloud } from './utils/userApi';
 import Onboarding from './components/Onboarding';
 import HomeScreen from './components/HomeScreen';
 import WalkScreen from './components/WalkScreen';
@@ -12,7 +13,7 @@ import SettingsScreen from './components/SettingsScreen';
 import BottomNav from './components/BottomNav';
 
 export default function App() {
-  const { isLoaded, isSignedIn, userId } = useAuth();
+  const { isLoaded, isSignedIn, userId, getToken } = useAuth();
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [user, setUser] = useState(null);
   const [tab, setTab] = useState('home'); // home | history | settings
@@ -45,12 +46,22 @@ export default function App() {
       return;
     }
 
-    // Signed in — scope storage to this Clerk user and load their data
+    // Signed in — scope storage to this Clerk user, try cloud first then localStorage
     setStorageUserId(userId);
-    const onboarded = hasUser();
-    setIsOnboarded(onboarded);
-    if (onboarded) setUser(getUser());
-  }, [isLoaded, isSignedIn, userId]);
+    async function loadUser() {
+      const cloudUser = await loadUserFromCloud(getToken);
+      if (cloudUser) {
+        saveUser(cloudUser); // cache locally
+        setIsOnboarded(true);
+        setUser(cloudUser);
+      } else {
+        const onboarded = hasUser();
+        setIsOnboarded(onboarded);
+        if (onboarded) setUser(getUser());
+      }
+    }
+    loadUser();
+  }, [isLoaded, isSignedIn, userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 1. TrackingPage — PUBLIC, no auth required (emergency contacts must see this)
   if (isTrackingPage) return <TrackingPage />;
