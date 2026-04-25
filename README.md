@@ -1,40 +1,90 @@
-<p align="center">
-  <img src="public/logo.png" alt="Patrona" width="200" />
-</p>
+<p align="center"> <img src="public/logo.png" alt="Patrona Logo" width="200" /> </p> <h1 align="center">Patrona</h1> <p align="center"> <b>Your AI voice companion for getting home safe at night.</b> </p> <p align="center"> 🏆 <b>1st Place Winner — Columbia AI for Good Hackathon 2026</b> 🏆<br/> <i>Awarded $5,000 in ElevenLabs credits to accelerate development.</i> </p>
+📖 Overview
 
-# Patrona
+73% of women in America report feeling afraid to walk alone at night. Traditional safety apps require users to actively look at screens, navigate menus, or hold down buttons—actions that are often impossible when a person is in actual distress.
 
-**Your AI voice companion for getting home safe at night.**
+Patrona completely removes the screen from the safety equation. It is a full-stack, voice-first safety companion that walks you home. Utilizing low-latency WebRTC, Patrona converses with you naturally, acting as a virtual friend. In the background, it runs a sophisticated multi-tier silence detection and NLP safe-word monitor. If danger is detected, it silently reverse-geocodes your coordinates and dispatches emergency SMS alerts to your loved ones.
 
-Patrona is a real-time safety app that walks with you through voice conversation, monitors your well-being through silence detection, and silently alerts your emergency contacts if something goes wrong.
+✨ Core Features & Technical Architecture
+🗣️ Conversational Voice Engine
 
-## How It Works
+Powered by the ElevenLabs Conversational AI SDK and streamed via WebRTC, Patrona maintains a natural, low-latency dialogue. It actively listens to your responses and generates context-aware replies to keep you engaged and alert during your walk.
 
-1. **Start a walk** — Tap "Walk Me Home" and Patrona starts talking to you like a friend on the phone
-2. **Voice companion** — Patrona keeps you company with natural conversation powered by ElevenLabs Conversational AI
-3. **Silent monitoring** — If you stop responding, Patrona escalates through gentle check-ins before alerting your contacts
-4. **Safe word** — Say your secret safe word naturally in conversation and Patrona silently alerts your contacts without any indication to anyone nearby
-5. **Emergency SMS** — Your contacts receive your real-time address (or coordinates) via SMS so they can find you or call for help
+⏱️ Multi-Tier Silence Escalation (useSafetyMonitor.js)
 
-## Safety System
+Instead of relying on a panic button, Patrona monitors your responsiveness. If you stop talking, the system automatically escalates through three distinct tiers:
 
-Patrona uses a multi-tier escalation system:
+Tier 1 (90 seconds of silence): Triggers a gentle audio check-in (e.g., "Hey, you still there?").
+Tier 2 (+20 seconds / 110s total): Triggers a firmer, more urgent audio prompt (e.g., "I need to hear from you.").
+Tier 3 (+30 seconds / 140s total): Automatically triggers the emergency alert protocol without requiring any physical input.
+🤫 NLP Safe-Word Detection
 
-| Tier | Trigger | Action |
-|------|---------|--------|
-| 1 | 90 seconds of silence | Gentle check-in: "Hey, you still there?" |
-| 2 | 20 more seconds | Firmer check-in: "I need to hear from you" |
-| 3 | 30 more seconds | Emergency SMS sent to all contacts with address/coordinates |
-| Safe word | Detected in speech | Immediate silent alert — Patrona keeps talking normally |
+Users can set a custom safe word. The useSafetyMonitor hook continuously scans the real-time transcript. If the safe word is spoken naturally in conversation, the app triggers a silent alert. There is absolutely no UI or audio indication that an alert was fired, ensuring an aggressor remains unaware while Patrona keeps chatting normally.
 
-When an alert is triggered, the app also shows a **Call 911** button to quickly dial emergency services.
+📍 Real-Time Location & Geocoding Pipeline (api/alert.js)
 
-## Built With
+When an alert is triggered (via silence, safe-word, or route deviation):
 
-- **React 18 + Vite** — Frontend
-- **ElevenLabs Conversational AI** — Voice companion (WebRTC)
-- **Textbelt** — SMS alerts
-- **OpenStreetMap (Nominatim)** — Reverse geocoding for address in SMS alerts
-- **Supabase** — Location ping storage
-- **Clerk** — User authentication
-- **Vercel** — Hosting + serverless API functions
+The frontend dispatches raw GPS coordinates to the Vercel serverless backend.
+The api/alert.js function utilizes the OpenStreetMap (Nominatim) API to reverse-geocode the exact latitude and longitude into a human-readable street address.
+The system generates a live tracking URL.
+💬 Emergency SMS Dispatch (api/_lib/sms.js)
+
+The backend securely interfaces with the Textbelt API to text pre-set emergency contacts. The message includes:
+
+The user's name.
+The specific trigger reason (Safe word, Silence, or Route Deviation).
+The human-readable street address (e.g., Near 116th and Broadway).
+A fallback link to Google Maps coordinates.
+🛠️ Tech Stack
+
+Frontend
+
+React 18 + Vite
+Tailwind CSS
+Clerk (User Authentication)
+ElevenLabs Client SDK (@elevenlabs/client)
+
+Backend & Infrastructure
+
+Vercel Serverless Functions (/api routes)
+Supabase (Real-time DB for location pings and user data)
+Textbelt (SMS Dispatching) (Note: Twilio is available in dependencies as an alternative)
+OpenStreetMap Nominatim API (Reverse Geocoding)
+🚀 Getting Started
+Prerequisites
+Node.js (v18+)
+API Keys for: Clerk, Supabase, ElevenLabs, and Textbelt.
+Installation
+
+Clone the repository:
+
+git clone https://github.com/ketakiii3/patrona.git
+cd patrona
+
+Install dependencies:
+
+npm install
+
+Set up Environment Variables:
+Create a .env file in the root directory and add the necessary keys based on .env.example:
+
+VITE_API_URL=http://localhost:3000
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_key
+CLERK_SECRET_KEY=your_clerk_secret
+TEXTBELT_KEY=your_textbelt_key
+# Add your Supabase and ElevenLabs keys here
+
+Run the development server:
+
+npm run dev
+🔐 Security & Rate Limiting
+
+To prevent abuse, the backend implements strict security measures:
+
+CORS & Auth Validation: All /api/alert requests must pass Clerk Bearer token validation (api/_lib/auth.js).
+Rate Limiting: IP-based rate limiting restricts users to 5 emergency alerts per 15-minute window (api/_lib/rateLimit.js).
+Payload Validation: Strict byte-size limits and body schema validation prevent malformed requests (api/_lib/validate.js).
+👩‍💻 The Team
+
+Built in 36 hours from scratch by Ketaki Dabade and Sahiti.
