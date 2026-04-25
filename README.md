@@ -135,32 +135,3 @@ git clone https://github.com/ketakiii3/patrona.git
 cd patrona
 npm install
 
-## 🔧 Environment Variables
-
-Create a `.env` file:
-
-VITE\_API\_URL=http://localhost:3000  
-VITE\_CLERK\_PUBLISHABLE\_KEY=your\_clerk\_key  
-CLERK\_SECRET\_KEY=your\_clerk\_secret  
-TEXTBELT\_KEY=your\_textbelt\_key  
-\# Add Supabase + ElevenLabs keys
-
-* * *
-
-## ▶️ Run the App
-
-npm run dev
-
-* * *
-
-## 🔐 Security & Rate Limiting
-
--   **Auth Validation:** Clerk Bearer token required for `/api/alert`
--   **Rate Limiting:** 5 alerts per 15 minutes per IP
--   **Payload Validation:** Strict schema + size limits
-
-* * *
-
-## 👩‍💻 The Team
-
-Built in 36 hours from scratch by **Ketaki Dabade** and **Sahiti**.
