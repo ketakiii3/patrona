@@ -10,6 +10,7 @@
   --bg:       #111110;
   --surface:  #1c1b18;
   --accent:   #87a696;
+  --accent-2: #f1b4be;   /* blush pink — exact logo rose, secondary warmth accent */
   --text:     #e8e4dd;
   --text-2:   #8c8680;
   --text-3:   #4a4642;
@@ -35,9 +36,10 @@
    DESIGN TOKENS — LIGHT THEME
 ───────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg:       #f7f5f2;
-  --surface:  #edebe6;
-  --accent:   #4e7d6a;
+  --bg:       #f5f4f4;   /* neutral — zero pink in the background */
+  --surface:  #eae8e8;
+  --accent:   #b85c76;   /* pink is the LEAD accent in light mode (the role teal plays in dark) */
+  --accent-2: #4e7d6a;   /* sage as the secondary accent in light mode */
   --text:     #1e1c1a;
   --text-2:   #706a62;
   --text-3:   #b0a89e;
@@ -46,7 +48,7 @@
   --green:    #3d7a5c;
 
   /* Derived */
-  --surface2:    #e4e1da;
+  --surface2:    #e2e0e0;
   --border2:     rgba(0, 0, 0, 0.04);
   --text-dim:    var(--text-2);
   --text-muted:  var(--text-3);

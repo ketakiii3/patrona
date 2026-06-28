@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patrona — Never walk alone</title>
+  <meta name="description" content="Patrona is a voice companion that walks you home. A real voice on the line, silence detection, a covert safe word, and one-tap escalation to your people and 911. Coming soon to iOS." />
+  <meta name="theme-color" content="#111110" />
+  <link rel="icon" type="image/png" href="public/logo.png" />
+  <link rel="apple-touch-icon" href="public/logo.png" />
+
+  <!-- Open Graph / social sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Patrona — Never walk alone" />
+  <meta property="og:description" content="A voice companion that walks you home. Not a panic button — a presence. Coming soon to iOS." />
+  <meta property="og:image" content="public/logo.png" />
+  <meta property="og:site_name" content="Patrona" />
+  <!-- Set this to your live domain before launch, e.g. https://patrona.app -->
+  <meta property="og:url" content="https://patrona.app" />
+
+  <!-- Twitter card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Patrona — Never walk alone" />
+  <meta name="twitter:description" content="A voice companion that walks you home. Not a panic button — a presence. Coming soon to iOS." />
+  <meta name="twitter:image" content="public/logo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Lora:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet" />
+
+<style>
+  /* Blush synced to the true logo rose (#f1b4be) so site + app + logo match */
+  .pw { --bg:#111110; --surface:#1c1b18; --surface2:#242320; --sage:#87a696; --blush:#f1b4be; --text:#e8e4dd; --text2:#8c8680; --text3:#4a4642; --border:rgba(255,255,255,0.07); --alert:#c08060; --green:#7aab8f; }
+  html,body { margin:0; padding:0; background:#111110; }
+  .pw * { box-sizing:border-box; margin:0; padding:0; }
+  .pw { background:var(--bg); color:var(--text); font-family:'DM Sans',system-ui,sans-serif; font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased; width:100%; overflow-x:hidden; }
+
+  .pw-lora { font-family:'Lora',Georgia,serif; font-style:italic; font-weight:400; }
+  .pw-sage { color:var(--sage); }
+  .pw-blush { color:var(--blush); }
+
+  /* NAV */
+  .pw nav { display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2rem; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:100; }
+  .pw .nav-brand { display:flex; align-items:center; gap:0.55rem; }
+  .pw .nav-brand img { width:26px; height:26px; border-radius:7px; display:block; }
+  .pw .nav-logo { font-family:'Lora',Georgia,serif; font-style:italic; font-size:1.3rem; color:var(--blush); letter-spacing:-0.01em; }
+  .pw .nav-links { display:flex; gap:1.5rem; align-items:center; }
+  .pw .nav-links a { color:var(--text3); font-size:0.82rem; text-decoration:none; transition:color 0.2s; letter-spacing:0.01em; }
+  .pw .nav-links a:hover { color:var(--text); }
+  .pw .nav-pill { background:transparent; border:1px solid rgba(135,166,150,0.4); color:var(--sage); font-size:0.78rem; padding:0.35rem 0.85rem; border-radius:20px; font-family:'DM Sans',sans-serif; cursor:default; letter-spacing:0.03em; }
+
+  /* HERO */
+  .pw .hero { padding:5.5rem 2rem 4rem; max-width:720px; margin:0 auto; text-align:center; }
+  .pw .hero-eyebrow { font-size:0.7rem; letter-spacing:0.14em; color:var(--text3); text-transform:uppercase; font-weight:400; margin-bottom:2rem; display:flex; align-items:center; justify-content:center; gap:0.75rem; }
+  .pw .hero-eyebrow span { display:inline-block; width:24px; height:1px; background:var(--text3); opacity:0.5; }
+  .pw .hero-h1 { font-size:clamp(2.2rem,5.5vw,3.8rem); font-weight:300; line-height:1.12; color:var(--text); letter-spacing:-0.025em; margin-bottom:0.5rem; }
+  .pw .hero-h1-2 { font-size:clamp(2.2rem,5.5vw,3.8rem); font-weight:300; line-height:1.12; color:var(--blush); letter-spacing:-0.025em; margin-bottom:1.75rem; font-family:'Lora',Georgia,serif; font-style:italic; }
+  .pw .hero-sub { font-size:1rem; color:var(--text2); max-width:440px; margin:0 auto 2.5rem; font-weight:300; line-height:1.75; }
+  .pw .hero-actions { display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .pw .btn-primary { background:var(--sage); color:#111110; font-weight:600; padding:0.75rem 1.6rem; border-radius:8px; border:none; cursor:pointer; font-size:0.875rem; font-family:'DM Sans',sans-serif; display:inline-flex; align-items:center; gap:0.4rem; transition:opacity 0.2s; }
+  .pw .btn-primary:hover { opacity:0.9; }
+  .pw .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border); padding:0.75rem 1.6rem; border-radius:8px; border-color:rgba(255,255,255,0.12); font-size:0.875rem; font-family:'DM Sans',sans-serif; cursor:pointer; transition:color 0.2s,border-color 0.2s; }
+  .pw .btn-ghost:hover { color:var(--text); border-color:rgba(255,255,255,0.25); }
+  .pw .coming-tag { font-size:0.68rem; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; text-align:center; }
+  .pw .hp-btn { background:transparent; border:none; color:var(--text3); font-size:0.78rem; cursor:pointer; padding:0.5rem 0.75rem; border-radius:6px; font-family:'Lora',Georgia,serif; font-style:italic; margin-top:2rem; transition:color 0.2s; display:inline-block; border:1px solid rgba(255,255,255,0.06); }
+  .pw .hp-btn:hover { color:var(--blush); border-color:rgba(241,180,190,0.2); }
+  .pw .hp-reveal { display:none; margin:1rem auto 0; max-width:420px; padding:1.25rem 1.5rem; background:rgba(241,180,190,0.06); border:1px solid rgba(241,180,190,0.15); border-radius:10px; text-align:left; }
+  .pw .hp-quote { font-family:'Lora',Georgia,serif; font-style:italic; color:var(--blush); font-size:0.95rem; line-height:1.6; margin-bottom:0.5rem; }
+  .pw .hp-note { font-size:0.75rem; color:var(--text3); line-height:1.6; }
+  .pw .lamp-line { width:1px; height:48px; background:linear-gradient(to bottom,rgba(135,166,150,0.4),transparent); margin:2.5rem auto 0; }
+
+  /* SECTIONS */
+  .pw .sec { padding:4rem 2rem; max-width:800px; margin:0 auto; border-top:1px solid var(--border); scroll-margin-top:70px; }
+  .pw .sec-label { font-size:0.68rem; letter-spacing:0.13em; color:var(--text3); text-transform:uppercase; font-weight:400; margin-bottom:1.25rem; }
+  .pw .sec-h { font-size:clamp(1.5rem,3vw,2rem); font-weight:300; color:var(--text); letter-spacing:-0.02em; line-height:1.25; margin-bottom:1rem; }
+  .pw .sec-h em { font-family:'Lora',Georgia,serif; font-style:italic; color:var(--blush); }
+  .pw .sec-h .sage-em { font-family:'Lora',Georgia,serif; font-style:italic; color:var(--sage); }
+  .pw .body-text { color:var(--text2); font-weight:300; line-height:1.75; }
+
+  /* ORIGIN */
+  .pw .origin-quote { font-family:'Lora',Georgia,serif; font-style:italic; font-size:1.3rem; color:var(--text); line-height:1.55; margin:1.75rem 0; padding-left:1.25rem; border-left:2px solid var(--blush); }
+  .pw .interview-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:2rem; }
+  .pw .i-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .pw .i-photo { height:130px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:var(--text3); letter-spacing:0.06em; border-bottom:1px solid var(--border); }
+  .pw .i-body { padding:1.1rem; }
+  .pw .i-quote { font-family:'Lora',Georgia,serif; font-style:italic; font-size:0.9rem; color:var(--text); line-height:1.55; margin-bottom:0.5rem; }
+  .pw .i-attr { font-size:0.72rem; color:var(--text3); }
+  .pw .blog-link { display:inline-flex; align-items:center; gap:0.4rem; margin-top:1.5rem; color:var(--sage); font-size:0.875rem; text-decoration:none; font-weight:400; }
+  .pw .blog-link:hover { color:var(--text); }
+
+  /* HOW IT WORKS */
+  .pw .steps { margin-top:2rem; }
+  .pw .step { display:flex; gap:1.25rem; padding:1.25rem 0; border-bottom:1px solid var(--border); align-items:flex-start; }
+  .pw .step:last-child { border-bottom:none; }
+  .pw .step-n { width:30px; height:30px; border-radius:50%; border:1px solid rgba(135,166,150,0.25); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.72rem; color:var(--sage); font-weight:500; margin-top:3px; }
+  .pw .step-t { font-weight:500; color:var(--text); margin-bottom:0.25rem; font-size:0.9rem; }
+  .pw .step-b { color:var(--text2); font-size:0.875rem; font-weight:300; line-height:1.7; }
+
+  /* APPSTORE BAND */
+  .pw .store-band { padding:3.5rem 2rem; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); text-align:center; scroll-margin-top:70px; }
+  .pw .store-inner { max-width:460px; margin:0 auto; }
+  .pw .store-h { font-size:1.5rem; font-weight:300; color:var(--text); margin-bottom:0.6rem; letter-spacing:-0.02em; }
+  .pw .store-h em { font-family:'Lora',Georgia,serif; font-style:italic; color:var(--blush); }
+  .pw .store-sub { color:var(--text2); font-size:0.875rem; font-weight:300; margin-bottom:1.75rem; }
+  .pw .store-btn { background:var(--text); color:#111110; border:none; padding:0.8rem 1.75rem; border-radius:10px; font-weight:600; font-size:0.875rem; display:inline-flex; align-items:center; gap:0.6rem; opacity:0.45; cursor:default; font-family:'DM Sans',sans-serif; }
+  .pw .waitlist-row { display:flex; gap:0.5rem; margin-top:1.5rem; }
+  .pw .waitlist-row input { flex:1; background:var(--surface2); border:1px solid rgba(255,255,255,0.1); color:var(--text); padding:0.65rem 1rem; border-radius:8px; font-size:0.875rem; font-family:'DM Sans',sans-serif; outline:none; }
+  .pw .waitlist-row input::placeholder { color:var(--text3); }
+  .pw .waitlist-row input:focus { border-color:rgba(135,166,150,0.4); }
+  .pw .waitlist-msg { font-size:0.8rem; margin-top:0.75rem; min-height:1rem; font-weight:300; }
+  .pw .waitlist-msg.ok { color:var(--green); }
+  .pw .waitlist-msg.err { color:var(--alert); }
+
+  /* WHY */
+  .pw .feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border-radius:12px; overflow:hidden; margin-top:2rem; }
+  .pw .feat { background:var(--bg); padding:1.4rem; }
+  .pw .feat-icon { font-size:1.1rem; margin-bottom:0.6rem; }
+  .pw .feat-t { font-weight:500; color:var(--text); font-size:0.875rem; margin-bottom:0.3rem; }
+  .pw .feat-b { color:var(--text2); font-size:0.8rem; font-weight:300; line-height:1.65; }
+
+  /* TEAM */
+  .pw .team-photos { display:flex; gap:1rem; margin-top:2rem; }
+  .pw .team-photo { flex:1; height:200px; background:var(--surface); border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:var(--text3); letter-spacing:0.06em; }
+  .pw .team-text { margin-top:1.5rem; }
+
+  /* RECOGNITION */
+  .pw .awards { display:flex; flex-direction:column; gap:0.75rem; margin-top:2rem; }
+  .pw .award { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem 1.4rem; display:flex; gap:1rem; align-items:flex-start; }
+  .pw .award-icon { font-size:1.3rem; flex-shrink:0; }
+  .pw .award-t { font-weight:500; color:var(--text); font-size:0.9rem; margin-bottom:0.2rem; }
+  .pw .award-b { color:var(--text2); font-size:0.8rem; font-weight:300; }
+
+  /* FAQS */
+  .pw .faq-item { border-bottom:1px solid var(--border); }
+  .pw .faq-q { width:100%; background:none; border:none; text-align:left; padding:1rem 0; color:var(--text); font-size:0.875rem; font-weight:400; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:1rem; font-family:'DM Sans',sans-serif; }
+  .pw .faq-q:hover { color:var(--sage); }
+  .pw .faq-chev { color:var(--text3); font-size:0.7rem; flex-shrink:0; transition:transform 0.22s; }
+  .pw .faq-chev.open { transform:rotate(180deg); }
+  .pw .faq-a { color:var(--text2); font-size:0.85rem; font-weight:300; line-height:1.75; max-height:0; overflow:hidden; transition:max-height 0.32s ease,padding 0.2s; }
+  .pw .faq-a.open { max-height:420px; padding-bottom:1rem; }
+
+  /* FOOTER */
+  .pw footer { border-top:1px solid var(--border); padding:2rem 2rem 1.5rem; max-width:800px; margin:0 auto; }
+  .pw .foot-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; }
+  .pw .foot-logo { font-family:'Lora',Georgia,serif; font-style:italic; font-size:1.1rem; color:var(--blush); }
+  .pw .foot-tagline { font-size:0.8rem; color:var(--text3); font-style:italic; font-family:'Lora',Georgia,serif; }
+  .pw .foot-links { display:flex; gap:1.25rem; }
+  .pw .foot-links a { color:var(--text3); font-size:0.78rem; text-decoration:none; }
+  .pw .foot-links a:hover { color:var(--text2); }
+  .pw .foot-copy { font-size:0.7rem; color:var(--text3); text-align:center; padding-top:1.25rem; border-top:1px solid var(--border); }
+
+  @media(max-width:580px){
+    .pw .interview-grid,.pw .feature-grid,.pw .team-photos { grid-template-columns:1fr; flex-direction:column; }
+    .pw .nav-links { display:none; }
+    .pw .hero,.pw .sec { padding-left:1.25rem; padding-right:1.25rem; }
+    .pw .waitlist-row { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="pw">
+
+  <nav>
+    <span class="nav-brand">
+      <img src="public/logo.png" alt="Patrona logo" />
+      <span class="nav-logo">patrona</span>
+    </span>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#story">Our story</a>
+      <a href="#faq">FAQ</a>
+      <span class="nav-pill">Coming soon to iOS</span>
+    </div>
+  </nav>
+
+  <!-- 1. WHO IS PATRONA / HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span></span>
+      your guardian for the walk home
+      <span></span>
+    </div>
+    <h1 class="hero-h1">"Get home safe."</h1>
+    <p class="hero-h1-2">We can do better than that.</p>
+    <p class="hero-sub">Everyone says it. No one does anything about it. Patrona is a voice companion that walks with you — so you're never really alone.</p>
+    <div class="hero-actions">
+      <button type="button" class="btn-primary" onclick="goWaitlist()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04l-.07.28zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Get early access
+      </button>
+      <a class="btn-ghost" href="#how" style="text-decoration:none;display:inline-flex;align-items:center;">See how it works</a>
+    </div>
+    <p class="coming-tag" style="margin-top:.75rem;">iOS · Coming soon</p>
+
+    <div style="margin-top:2rem;">
+      <button type="button" class="hp-btn" id="hp-btn" onclick="castSpell()">✦ expecto patronum</button>
+      <div class="hp-reveal" id="hp-reveal">
+        <p class="hp-quote">"Happiness can be found even in the darkest of times, if one only remembers to turn on the light."</p>
+        <p class="hp-note" style="margin-top:.6rem;">Patrona is named for the Patronus charm — the guardian that walks with you through the dark. <em>Hp</em> is our origin story, not just our easter egg.</p>
+      </div>
+    </div>
+    <div class="lamp-line"></div>
+  </section>
+
+  <!-- 2. HOW IT STARTED -->
+  <section class="sec" id="story">
+    <p class="sec-label">how it started</p>
+    <h2 class="sec-h">We asked women what the walk home<br>actually feels like. <em>They told us everything.</em></h2>
+    <p class="origin-quote">"I hold my keys like a weapon. Every single night."</p>
+    <p class="body-text" style="margin-bottom:.75rem;">Before we wrote a single line of code, we sat down with women — students, late-shift workers, people who'd been on that walk. What they described wasn't just fear of something happening. It was the ordinary, exhausting anxiety of every single time.</p>
+    <p class="body-text">Patrona came from those conversations.</p>
+    <div class="interview-grid">
+      <div class="i-card">
+        <div class="i-photo">[ interview photo ]</div>
+        <div class="i-body">
+          <p class="i-quote">"I text three people every time I walk home. If I don't reply, they worry for hours."</p>
+          <p class="i-attr">— Columbia student, March 2026</p>
+        </div>
+      </div>
+      <div class="i-card">
+        <div class="i-photo">[ interview photo ]</div>
+        <div class="i-body">
+          <p class="i-quote">"I've started faking phone calls. I just want to look less alone."</p>
+          <p class="i-attr">— NYC resident, March 2026</p>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="blog-link">Read their stories — and ours →</a>
+  </section>
+
+  <!-- 3. HOW IT WORKS -->
+  <section class="sec" id="how">
+    <p class="sec-label">how it works</p>
+    <h2 class="sec-h">Start a walk. Talk, or don't.<br><span class="sage-em">Get home safe.</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div>
+          <p class="step-t">Tap once to start your walk</p>
+          <p class="step-b">Patrona picks up like a friend calling to check on you. Your GPS turns on quietly. Your people are ready if they're ever needed.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div>
+          <p class="step-t">Talk, or just let the company settle you</p>
+          <p class="step-b">Chat about your day, or stay quiet. If you go silent for a while, Patrona gently checks in. Hands-free. Eyes up. No phone-staring required.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div>
+          <p class="step-t">Say the word — Patrona acts</p>
+          <p class="step-b">A natural signal tells Patrona something's wrong — no dramatic button, nothing that tips anyone off. It alerts your contacts and gives you one tap to 911 with your location already loaded.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div>
+          <p class="step-t">"I'm home."</p>
+          <p class="step-b">Check in when you arrive. Your contacts get the all-clear. The walk is closed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. APP STORE -->
+  <div class="store-band" id="waitlist">
+    <div class="store-inner">
+      <h2 class="store-h">Never walk alone. <em>Again.</em></h2>
+      <p class="store-sub">Join the waitlist — be first when we launch on iOS.</p>
+      <button class="store-btn" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04l-.07.28zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div style="text-align:left;">
+          <span style="font-size:0.65rem;font-weight:400;display:block;">Download on the</span>
+          <span style="font-size:1rem;font-weight:600;display:block;">App Store</span>
+        </div>
+      </button>
+      <!-- TODO: replace YOUR_FORM_ID with your Formspree (or other) form id -->
+      <form class="waitlist-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="waitlist-row">
+          <input type="email" name="email" placeholder="your@email.com" aria-label="Email address" required />
+          <button type="submit" class="btn-primary" style="white-space:nowrap;font-size:0.82rem;padding:.65rem 1.1rem;">Join waitlist</button>
+        </div>
+        <p class="waitlist-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. WHY PATRONA -->
+  <section class="sec">
+    <p class="sec-label">why patrona</p>
+    <h2 class="sec-h">Not a panic button.<br><em>A presence.</em></h2>
+    <p class="body-text" style="margin-bottom:2rem;">Every other safety app waits for you to decide you're in danger. Patrona is with you before that moment — so it hopefully never comes.</p>
+    <div class="feature-grid">
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--blush);">◎</div>
+        <p class="feat-t">A real voice on the line</p>
+        <p class="feat-b">Two-way conversation, not a recording. A friend's voice, not a script. Hands-free, eyes on your surroundings.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--sage);">~</div>
+        <p class="feat-t">Silence detection</p>
+        <p class="feat-b">Go quiet and Patrona gently checks in — so a problem is caught even when you can't say it out loud.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--blush);">◐</div>
+        <p class="feat-t">Covert safe word</p>
+        <p class="feat-b">A casual word or phrase — nothing dramatic — tells Patrona to act without tipping off anyone near you.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--sage);">⊕</div>
+        <p class="feat-t">Escalation with context</p>
+        <p class="feat-b">One tap to 911. Your live location and call context already loaded. Your contacts already notified.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--blush);">◷</div>
+        <p class="feat-t">Looks normal</p>
+        <p class="feat-b">Being on a call reads as occupied and connected — not alone, not scared, not an easy target.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" style="color:var(--sage);">✓</div>
+        <p class="feat-t">"I'm home safe"</p>
+        <p class="feat-b">Live GPS the whole walk. A simple check-in closes the loop for you and the people who care about you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. WHO WE ARE -->
+  <section class="sec">
+    <p class="sec-label">who we are</p>
+    <h2 class="sec-h">Two Columbia grad students<br>who'd been on <em>that walk.</em></h2>
+    <div class="team-photos">
+      <div class="team-photo">[ photo — Ketaki ]</div>
+      <div class="team-photo">[ photo — Sahiti ]</div>
+    </div>
+    <div class="team-text">
+      <p class="body-text" style="margin-bottom:.75rem;">We're Ketaki and Sahiti. We built Patrona because we were tired of texting three people every time we walked home at night — and because everyone around us was doing the same thing and calling it fine.</p>
+      <p class="body-text">We started with interviews, not code. We wanted to understand what the walk actually feels like before we tried to change it. Then we built, entered the Columbia AI for Good Hackathon, and won. We kept going because the problem didn't stop mattering.</p>
+    </div>
+  </section>
+
+  <!-- 7. RECOGNITION -->
+  <section class="sec">
+    <p class="sec-label">recognition</p>
+    <h2 class="sec-h"><em>The judges saw the use case.</em><br>So did everyone else.</h2>
+    <p class="body-text" style="margin-bottom:0;">We didn't just win on the tech. The judges remembered the interviews, the women behind the data, and who Patrona was actually built for.</p>
+    <div class="awards">
+      <div class="award">
+        <div class="award-icon">🏆</div>
+        <div>
+          <p class="award-t">First Place — Columbia AI for Good Hackathon 2026</p>
+          <p class="award-b">Awarded across all tracks. Judges noted the depth of user research and the urgency of the problem.</p>
+        </div>
+      </div>
+      <div class="award">
+        <div class="award-icon">🎙</div>
+        <div>
+          <p class="award-t">Best Project Made with ElevenLabs</p>
+          <p class="award-b">Recognised for the most meaningful use of AI voice — not a demo, not a gimmick. The product itself.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. APP STORE AGAIN -->
+  <div class="store-band">
+    <div class="store-inner">
+      <h2 class="store-h" style="font-family:'Lora',Georgia,serif;font-style:italic;color:var(--blush);font-size:1.8rem;font-weight:400;">Never walk alone.</h2>
+      <p class="store-sub">Patrona is coming to iOS. Get early access.</p>
+      <button class="store-btn" disabled style="margin-bottom:.75rem;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04l-.07.28zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div style="text-align:left;">
+          <span style="font-size:0.65rem;font-weight:400;display:block;">Download on the</span>
+          <span style="font-size:1rem;font-weight:600;display:block;">App Store</span>
+        </div>
+      </button>
+      <button type="button" class="btn-ghost" onclick="goWaitlist()" style="display:block;margin:0 auto;">Get early access</button>
+    </div>
+  </div>
+
+  <!-- 9. FAQs -->
+  <section class="sec" id="faq">
+    <p class="sec-label">questions</p>
+    <h2 class="sec-h"><em>Things people ask us.</em></h2>
+    <div id="faqs" style="margin-top:1.5rem;"></div>
+  </section>
+
+  <!-- 10. FOOTER -->
+  <footer>
+    <div class="foot-row">
+      <span class="foot-logo">patrona</span>
+      <span class="foot-tagline">Never walk alone.</span>
+      <div class="foot-links">
+        <!-- Point to your hosted privacy policy before launch -->
+        <a href="privacy.html">Privacy</a>
+        <a href="mailto:hello@patrona.app">Contact</a>
+        <a href="#" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <p class="foot-copy">© 2026 Patrona · Built at Columbia University</p>
+  </footer>
+
+</div>
+
+<script>
+const faqs=[
+  {q:"What makes Patrona different from other safety apps?",a:"Most safety apps wait for you to tell them something's wrong. Patrona is with you the whole walk — a live voice companion that talks with you, notices if you go silent, and escalates quietly if it has to. It's a presence, not a panic button."},
+  {q:"Is my location private? Who can see it?",a:"Your live location is only shared with the emergency contacts you choose, and only during an active walk session. We don't store or sell location data. When your walk ends, the session closes."},
+  {q:"What happens if I go silent during a walk?",a:"If you stop responding, Patrona gently checks in. If there's still no response after a short while, it escalates on its own and notifies your emergency contacts — no button to press, no app to open."},
+  {q:"Does it actually call 911?",a:"If your safe word is triggered, Patrona alerts your emergency contacts and gives you one tap to 911 — with your GPS location and call context already prepared. You make the call; we make it as fast and informed as possible."},
+  {q:"Does it work if I don't want to talk?",a:"Yes. Stay quiet the whole walk if you want. Patrona will gently check in if you've been silent for a while, but it's not demanding. Think of it as company, not a conversation requirement."},
+  {q:"Do I need an internet connection?",a:"Patrona needs a data connection for the voice companion and live location features — similar to being on a regular phone call."},
+  {q:"When will it be available, and on which platforms?",a:"We're launching on iOS first. Add your email above to get early access. Android is on the roadmap."},
+  {q:"How do I set my safe word?",a:"You set it in your profile during onboarding — any word or phrase that sounds natural in conversation. Nothing dramatic that would tip anyone off. You can change it any time in settings."}
+];
+
+const el=document.getElementById('faqs');
+faqs.forEach((f,i)=>{
+  const d=document.createElement('div');
+  d.className='faq-item';
+  d.innerHTML=`<button type="button" class="faq-q" onclick="tf(${i})"><span>${f.q}</span><span class="faq-chev" id="c${i}">▾</span></button><div class="faq-a" id="a${i}">${f.a}</div>`;
+  el.appendChild(d);
+});
+
+function tf(i){
+  const a=document.getElementById('a'+i),c=document.getElementById('c'+i);
+  const open=a.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.faq-chev').forEach(x=>x.classList.remove('open'));
+  if(!open){a.classList.add('open');c.classList.add('open');}
+}
+
+function castSpell(){
+  const r=document.getElementById('hp-reveal'),b=document.getElementById('hp-btn');
+  const on=r.style.display==='block';
+  r.style.display=on?'none':'block';
+  b.textContent=on?'✦ expecto patronum':'✦ nox';
+}
+
+function goWaitlist(){
+  const w=document.getElementById('waitlist');
+  w.scrollIntoView({behavior:'smooth'});
+  const input=w.querySelector('input[type=email]');
+  if(input) setTimeout(()=>input.focus(),400);
+}
+
+// Waitlist submit — progressive enhancement over the Formspree form.
+// Until YOUR_FORM_ID is set, it validates + shows a friendly confirmation locally.
+document.querySelectorAll('.waitlist-form').forEach(form=>{
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const msg=form.querySelector('.waitlist-msg');
+    const input=form.querySelector('input[type=email]');
+    const email=(input.value||'').trim();
+    const valid=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if(!valid){ msg.textContent='Please enter a valid email.'; msg.className='waitlist-msg err'; return; }
+    const configured = !form.action.includes('YOUR_FORM_ID');
+    if(!configured){
+      msg.textContent="You're on the list. ✦ (Connect a form provider to start collecting emails.)";
+      msg.className='waitlist-msg ok'; input.value=''; return;
+    }
+    try{
+      const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+      if(res.ok){ msg.textContent="You're on the list — we'll be in touch. ✦"; msg.className='waitlist-msg ok'; input.value=''; }
+      else { msg.textContent='Something went wrong. Please try again.'; msg.className='waitlist-msg err'; }
+    }catch(err){ msg.textContent='Network error. Please try again.'; msg.className='waitlist-msg err'; }
+  });
+});
+</script>
+
+</body>
+</html>

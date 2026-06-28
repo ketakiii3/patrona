@@ -11,6 +11,16 @@ Version 1.0 · June 2026 · Tokens reflect the live system in `src/index.css`.
 
 Think: the warmth of a lamp-lit street and a friend on the phone — not a dashboard of sirens. The brand motif is **guidance and illumination** (a streetlamp casting light). Reference feel: the restraint of Linear/Things, the calm of a meditation app, but warmer and more human.
 
+### Color strategy: sage primary + blush secondary (matching the logo)
+
+The Patrona logo is **blush pink + teal/sage** (a navy panel with teal glow rings, a cream lamp on a pink-tinted post, all on a rose background). The app's sage accent already echoes the logo's teal glow — but the logo's **pink** was previously absent from the UI. We bring it in deliberately as a **soft secondary accent**, so the app finally matches its own logo, *without* becoming a "pink app."
+
+- **Sage stays primary** — CTAs, active states, the core calm tone. (Pink as the dominant theme is avoided: it risks the "pink = women's app" cliché and dilutes the premium, serious-safety feel that differentiates Patrona.)
+- **Blush pink is secondary/warmth** — the brand wordmark, the voice waveform glow, success/arrived moments, and subtle accents. It signals *warmth and companionship*, not alarm.
+- **Light theme leans warm** — a faint blush-tinted "warm paper" background is where pink reads as calming rather than loud.
+
+This also resolves a brand-consistency gap: previously the app (sage), the splash (`#5B4FCF` purple), and the logo (pink+teal) told three different color stories. Aligning everything to the **logo's pink + sage** makes the brand coherent end to end.
+
 ## Color palette (from `src/index.css` design tokens)
 
 **Dark theme (default):**
@@ -21,6 +31,7 @@ Think: the warmth of a lamp-lit street and a friend on the phone — not a dashb
 | `--surface` | `#1c1b18` | Cards / panels |
 | `--surface2` | `#242320` | Raised surface |
 | `--accent` | `#87a696` | **Primary accent — sage green** (CTAs, active states) |
+| `--accent-2` | `#e0a6b0` | **Secondary accent — blush pink** (wordmark, waveform glow, soft highlights) — *new, from the logo* |
 | `--text` | `#e8e4dd` | Primary text (warm off-white) |
 | `--text-2` | `#8c8680` | Secondary text |
 | `--text-3` | `#4a4642` | Muted / tertiary text |
@@ -32,16 +43,21 @@ Think: the warmth of a lamp-lit street and a friend on the phone — not a dashb
 
 | Token | Hex | Role |
 | :---- | :---- | :---- |
-| `--bg` | `#f7f5f2` | Background (warm paper) |
-| `--surface` | `#edebe6` | Cards / panels |
+| `--bg` | `#faf3f2` | Background (warm blush-tinted paper — leans into the logo's rose) |
+| `--surface` | `#f1e8e7` | Cards / panels |
 | `--accent` | `#4e7d6a` | Primary accent (deeper sage) |
+| `--accent-2` | `#c77f8d` | Secondary accent — blush pink (deeper for light-mode contrast) |
 | `--text` | `#1e1c1a` | Primary text |
 | `--text-2` | `#706a62` | Secondary text |
 | `--text-3` | `#b0a89e` | Muted text |
 | `--alert` | `#a05c35` | Alert accent |
 | `--green` | `#3d7a5c` | Success |
 
+> **Note:** the light-theme `--bg`/`--surface` above are revised toward a warm blush tone (was `#f7f5f2`/`#edebe6`). This is the "pink as calm warmth" move — verify AA contrast for `--text` on the new background before shipping.
+
 **Deliberate choice:** even the *alert* color is a warm terracotta, never an aggressive red. Escalation should feel firm and reassuring, not panic-inducing — consistent with "calm by design."
+
+**Where blush pink (`--accent-2`) is used — and where it isn't.** Use it for *warmth*, sparingly: the "patrona" wordmark, the voice-waveform glow (so the companion feels warm/alive), the arrived/success moment, and the occasional soft highlight or gradient on Home. **Do not** use it for primary CTAs (those stay sage), for alerts/escalation (terracotta), or as a full background fill in dark mode. Rule of thumb: sage carries function, pink carries feeling.
 
 ## Typography
 
@@ -85,7 +101,7 @@ The **waveform + pulse dot** are the emotional core of the walk screen: they mak
 - **Bottom tab navigation** (thumb-reachable) when idle; full-screen immersive walk experience otherwise.
 - **Safe-area insets:** must use `env(safe-area-inset-*)` so headers/footers clear the notch and Dynamic Island in the native shell (Build Guide §E.3).
 - **Status bar:** `black-translucent` set in `index.html`; match the native status bar style to the theme so text stays readable (`@capacitor/status-bar`).
-- **Splash:** background `#5B4FCF` configured in the Capacitor splash (Build Guide A.5) — *note:* this purple predates the sage system; **align the splash + app icon to the sage/warm palette before App Store submission** for brand consistency.
+- **Splash:** background `#5B4FCF` configured in the Capacitor splash (Build Guide A.5) — *fix required:* this purple predates the brand and matches neither the app nor the logo. **Re-skin the splash to the logo palette before App Store submission** — recommend the logo's navy panel (`#1f2a33`-ish) or warm blush (`#faf3f2`) background with the sage/cream lamp mark — so splash, app, icon, and logo finally tell one color story.
 
 ## Accessibility
 
